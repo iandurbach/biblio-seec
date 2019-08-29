@@ -47,15 +47,25 @@ x <- x %>% mutate(cites = 0,
                   name_year = paste(author, year, sep = "_"))
 x <- x %>% dplyr::select(year, title, journal, cites, author,  n_authors, n_seec, credits, name_year)
 
-# only keep papers by seec core members
-seec_pubs_urc <- x %>% 
+# papers including at least one seec core member
+seec_core_pubs_urc <- x %>% 
   filter(name_year %in% seec_core) %>% 
   mutate(title = str_to_lower(title)) %>%
   mutate(title = str_squish(str_replace_all(title, '[[:punct:]]',' '))) %>%
   mutate(short_title = word(title, start = 1, end = 5))
 
-credited_papers <- seec_pubs_urc %>% group_by(short_title) %>% summarize(credits_earned = sum(credits),
+credited_papers_core <- seec_core_pubs_urc %>% group_by(short_title) %>% summarize(credits_earned = sum(credits),
                                                                    title = first(title),
                                                                    year = first(year))
 
+# papers including at least one seec member
+seec_allaff_pubs_urc <- x %>% 
+  filter(name_year %in% seec_allaff) %>% 
+  mutate(title = str_to_lower(title)) %>%
+  mutate(title = str_squish(str_replace_all(title, '[[:punct:]]',' '))) %>%
+  mutate(short_title = word(title, start = 1, end = 5))
+
+credited_papers_allaff <- seec_allaff_pubs_urc %>% group_by(short_title) %>% summarize(credits_earned = sum(credits),
+                                                                                   title = first(title),
+                                                                                   year = first(year))
 
