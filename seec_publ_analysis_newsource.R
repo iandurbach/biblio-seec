@@ -83,10 +83,14 @@ seec_pubs <- seec_pubs %>%
          match = (title == best_match))
 seec_pubs <- seec_pubs %>% select(title, best_match, match, credited, credits, everything()) %>% arrange(desc(year), title)
 
-# there's one error, 2018 paper by Henning with a very similar title ("Sharks.... 13" vs "Sharks.... 14")
+# few errors must be manually fixed up
+# 2018 paper by Henning with a very similar title ("Sharks.... 13" vs "Sharks.... 14")
 # nothing in 2018 has been accredited yet, so just manually change
 seec_pubs$credited[seec_pubs$year == 2018] <- FALSE
 seec_pubs$credits[seec_pubs$year == 2018] <- NA
+
+# not a paper
+seec_pubs <- seec_pubs %>% filter(!str_detect(title, "how can we reduce the impact of fishing"))
 
 ## summaries
 
@@ -97,7 +101,6 @@ all_by_year <- seec_pubs %>%
   summarize(unique = n_distinct(title), 
             all = n() - unique,
             units = sum(credits, na.rm = TRUE)) %>% 
-  filter(year < 2019) %>%
   mutate(units = ifelse(units == 0, mean(units[1:4]), units),
          value = ifelse(year < 2018, "actual", "projected")) 
 
@@ -115,6 +118,7 @@ p1 <- all_by_year %>%
   theme_bw(base_size=12) + 
   ylim(c(0,50)) +
   xlab("Year") + ylab("Number of papers") + 
+  scale_x_continuous(breaks = 2014:2019) +
   theme(axis.text=element_text(size=12), axis.title=element_text(size=12)) +
   theme(legend.position = "bottom", legend.text=element_text(size=12),
         legend.title=element_blank())
@@ -137,6 +141,7 @@ p2 <- all_by_year %>%
 options(scipen=1000000)
 
 p2a <- all_by_year %>%
+  filter(year < 2019) %>%
   ggplot(aes(x = year, y = subs_earned)) + 
   geom_line(alpha = 0.4) +
   geom_point(aes(colour = value, shape = value), size = 4) +
@@ -199,10 +204,14 @@ seec_pubs <- seec_pubs %>%
          match = (title == best_match))
 seec_pubs <- seec_pubs %>% select(title, best_match, match, credited, credits, everything()) %>% arrange(desc(year), title)
 
-# there's one error, 2018 paper by Henning with a very similar title ("Sharks.... 13" vs "Sharks.... 14")
+# few errors must be manually fixed up
+# 2018 paper by Henning with a very similar title ("Sharks.... 13" vs "Sharks.... 14")
 # nothing in 2018 has been accredited yet, so just manually change
 seec_pubs$credited[seec_pubs$year == 2018] <- FALSE
 seec_pubs$credits[seec_pubs$year == 2018] <- NA
+
+# not a paper
+seec_pubs <- seec_pubs %>% filter(!str_detect(title, "how can we reduce the impact of fishing"))
 
 ## summaries
 
@@ -213,7 +222,6 @@ all_by_year <- seec_pubs %>%
   summarize(unique = n_distinct(title), 
             all = n() - unique,
             units = sum(credits, na.rm = TRUE)) %>% 
-  filter(year < 2019) %>%
   mutate(units = ifelse(units == 0, mean(units[1:4]), units),
          value = ifelse(year < 2018, "actual", "projected")) 
 
@@ -231,6 +239,7 @@ p1 <- all_by_year %>%
   theme_bw(base_size=12) + 
   ylim(c(0,50)) +
   xlab("Year") + ylab("Number of papers") + 
+  scale_x_continuous(breaks = 2014:2019) + 
   theme(axis.text=element_text(size=12), axis.title=element_text(size=12)) +
   theme(legend.position = "bottom", legend.text=element_text(size=12),
         legend.title=element_blank())
@@ -253,6 +262,7 @@ p2 <- all_by_year %>%
 options(scipen=1000000)
 
 p2a <- all_by_year %>%
+  filter(year < 2019) %>%
   ggplot(aes(x = year, y = subs_earned)) + 
   geom_line(alpha = 0.4) +
   geom_point(aes(colour = value, shape = value), size = 4) +
